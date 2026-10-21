@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 async function enterPin(page: import('@playwright/test').Page, pin: string) {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
-  await page.getByRole('heading', { name: /nopalpante/i }).waitFor();
+  await page.getByRole('heading', { name: /nopal/i }).waitFor();
   for (const [index, digit] of [...pin].entries()) {
     await page.getByRole('button', { name: `Angka ${digit}` }).click();
     await expect(page.locator('.pin-dots')).toHaveAttribute('aria-label', `${index + 1} dari 4 angka terisi`);
@@ -32,15 +32,18 @@ test('the first visit opens with a loading screen before the intro', async ({ pa
 test('an incorrect PIN keeps the visitor on the intro', async ({ page }) => {
   await enterPin(page, '1111');
   await expect(page.locator('.form-message')).toContainText(/belum tepat|coba lagi/i);
-  await expect(page.getByRole('heading', { name: /nopalpante/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /nopal/i })).toBeVisible();
 });
 
 test('the intro shows the new bouquet instead of the spider', async ({ page }) => {
   await page.goto('/');
+  await expect(page).toHaveTitle('Untuk Nopal — cerita ulang tahun kecil');
+  await expect(page.getByRole('heading', { name: 'nopal' })).toBeVisible();
   const bouquet = page.locator('.intro-bouquet');
   await expect(bouquet).toBeVisible();
   await expect(bouquet).toHaveAttribute('src', '/img/newbuket.png');
-  await expect(page.locator('.intro-made')).toHaveText('made for you ♥');
+  await expect(page.locator('.intro-made')).toHaveText('made for you ✦');
+  await expect(page.locator('.pin-icon')).toHaveText('✦');
   await expect(page.locator('.topbar')).toHaveCount(0);
   await expect(page.locator('.intro-scene .intro-spider')).toHaveCount(0);
   await expect(page.locator('.intro-sparkles .ambient-motif')).toHaveCount(16);
@@ -51,6 +54,7 @@ test('demo PIN 1234 opens the gift screen and the gift starts the flower game', 
   await enterPin(page, '1234');
   await expect(page.getByRole('heading', { name: /a little gift for you/i })).toBeVisible();
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
+  await expect(page.locator('.gift-eyebrow')).toHaveText(/YOU DID IT, nopal!/i);
   await page.getByRole('button', { name: /ambil bunganya/i }).click();
   await expect(page.getByRole('heading', { name: /tangkap 6 bunga/i })).toBeVisible();
 });
@@ -167,8 +171,48 @@ test('blowing out the candle shows a gentle confetti celebration', async ({ page
   await expect(page.locator('.wish-scene')).toHaveClass(/gift-opened/);
   await expect(page.locator('.wish-scene .gift-letter')).toHaveCSS('animation-name', 'bouquet-unbox');
   await expect(page.getByRole('heading', { name: /selamat ulang tahun/i })).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('.wish-gift-message .message-signoff')).toContainText('Salam,');
+  await expect(page.locator('.wish-gift-message .message-signoff')).not.toContainText(/sayang/i);
   await expect(page.locator('.wish-scene .gift-box-scene')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /masih ada kejutan kecil untukmu/i })).toBeVisible();
+  await page.getByRole('button', { name: /masih ada kejutan kecil untukmu/i }).click();
+  await expect(page.locator('.portrait-scene')).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('img', { name: /placeholder foto nopal/i })).toBeVisible();
+  await expect(page.locator('.portrait-placeholder-star')).toHaveText('✦');
+  await expect(page.locator('.portrait-letter')).toContainText('Selamat ulang tahun, Nopal.');
+  await expect(page.locator('.portrait-scene h1, .portrait-bouquet, .portrait-sparkle')).toHaveCount(0);
+  const rotation = await page.locator('.portrait-frame').evaluate((element) => {
+    const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+    return Math.abs(Math.atan2(matrix.b, matrix.a) * 180 / Math.PI);
+  });
+  expect(rotation).toBeGreaterThan(2);
+  const portraitPhoto = await page.locator('.portrait-frame').boundingBox();
+  const portraitLetter = await page.locator('.portrait-letter').boundingBox();
+  expect(portraitPhoto && portraitLetter).toBeTruthy();
+  const mobilePolaroidWidth = await page.locator('.portrait-frame').evaluate((element) => parseFloat(getComputedStyle(element).width));
+  expect(mobilePolaroidWidth).toBeLessThanOrEqual(180);
+  expect(portraitPhoto!.width).toBeLessThanOrEqual(195);
+  expect(portraitPhoto!.height / portraitPhoto!.width).toBeGreaterThan(1.2);
+  expect(portraitPhoto!.y + portraitPhoto!.height).toBeLessThan(portraitLetter!.y);
+  const portraitContinue = await page.getByRole('button', { name: /lanjut ke piknik/i }).boundingBox();
+  const portraitMusic = await page.locator('.music-dock').boundingBox();
+  expect(portraitContinue && portraitMusic).toBeTruthy();
+  expect(portraitContinue!.y + portraitContinue!.height).toBeLessThan(portraitMusic!.y);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const desktopPolaroid = await page.locator('.portrait-frame').boundingBox();
+  const desktopPolaroidWidth = await page.locator('.portrait-frame').evaluate((element) => parseFloat(getComputedStyle(element).width));
+  expect(desktopPolaroidWidth).toBeLessThanOrEqual(240);
+  expect(desktopPolaroid!.width).toBeLessThanOrEqual(260);
+  expect(desktopPolaroid!.height / desktopPolaroid!.width).toBeGreaterThan(1.2);
+  const desktopRotation = await page.locator('.portrait-frame').evaluate((element) => {
+    const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+    return Math.abs(Math.atan2(matrix.b, matrix.a) * 180 / Math.PI);
+  });
+  expect(desktopRotation).toBeGreaterThan(2);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: /lanjut ke piknik/i }).click();
+  await expect(page.getByRole('heading', { name: /siapkan piknik/i })).toBeVisible();
 });
 
 test('Dlynn-style picnic and catcher lead into the Kienan-style maze', async ({ page }) => {
@@ -187,6 +231,7 @@ test('Dlynn-style picnic and catcher lead into the Kienan-style maze', async ({ 
   await page.getByRole('button', { name: /buka kotak hadiah/i }).click();
   await page.getByRole('button', { name: /masih ada kejutan kecil untukmu/i }).waitFor();
   await page.getByRole('button', { name: /masih ada kejutan kecil untukmu/i }).click();
+  await page.getByRole('button', { name: /lanjut ke piknik/i }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   const picnicBoard = await page.locator('.picnic-board').boundingBox();
   expect(picnicBoard?.width).toBeLessThanOrEqual(390);

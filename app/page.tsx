@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { flowers, gift, picnicCategories, picnicItems } from './data';
 
-type Scene = 'intro' | 'gift' | 'flowers' | 'envelope' | 'memories' | 'candle' | 'wish' | 'picnic' | 'catch-again' | 'delivery' | 'complete';
+type Scene = 'intro' | 'gift' | 'flowers' | 'envelope' | 'memories' | 'candle' | 'wish' | 'portrait' | 'picnic' | 'catch-again' | 'delivery' | 'complete';
 type YTPlayer = { destroy: () => void };
 type YTState = { Player: new (id: string, options: { events: { onStateChange: (event: { data: number }) => void } }) => YTPlayer };
 declare global { interface Window { YT?: YTState; onYouTubeIframeAPIReady?: () => void } }
@@ -40,7 +40,7 @@ const transitionSpiders = Array.from({ length: 36 }, (_, index) => {
     delay: `${Math.min(0.13, distanceFromCenter * 0.018)}s`,
   };
 });
-const sceneOrder: Scene[] = ['intro', 'gift', 'flowers', 'envelope', 'memories', 'candle', 'wish', 'picnic', 'catch-again', 'delivery', 'complete'];
+const sceneOrder: Scene[] = ['intro', 'gift', 'flowers', 'envelope', 'memories', 'candle', 'wish', 'portrait', 'picnic', 'catch-again', 'delivery', 'complete'];
 
 export default function Home() {
   const [scene, setScene] = useState<Scene>('intro');
@@ -286,19 +286,19 @@ export default function Home() {
       <div className="scene-progress" aria-label={`Bagian ${sceneIndex + 1} dari ${sceneOrder.length}`}><span style={{ width: `${((sceneIndex + 1) / sceneOrder.length) * 100}%` }} /></div></>}
       {transition && <div className="transition-spider" aria-hidden="true">{transitionSpiders.map((item) => <Image className="transition-spider-bloom" src={spider} alt="" width={400} height={400} key={item.id} style={{ '--spider-x': item.x, '--spider-y': item.y, '--spider-rotation': item.rotation, '--spider-scale': item.scale, '--spider-delay': item.delay } as React.CSSProperties} />)}</div>}
 
-      {scene === 'intro' && <section className="scene intro-scene"><div className="intro-sparkles" aria-hidden="true">{introMotifs.map((motif, index) => <span className="ambient-motif" key={index} style={{ left: motif.left, top: motif.top, animationDelay: `${(index % 6) * -0.8}s` }}>{motif.icon}</span>)}</div><span className="intro-made">made for you ♥</span>
+      {scene === 'intro' && <section className="scene intro-scene"><div className="intro-sparkles" aria-hidden="true">{introMotifs.map((motif, index) => <span className="ambient-motif" key={index} style={{ left: motif.left, top: motif.top, animationDelay: `${(index % 6) * -0.8}s` }}>{motif.icon}</span>)}</div><span className="intro-made">made for you ✦</span>
         <div className="intro-copy"><span className="kicker">a private little surprise for</span><h1><em>{gift.recipient}</em></h1><p>Ada kejutan kecil menunggumu. Masukkan PIN ulang tahun untuk membukanya.</p>
           <form className="pin-card" onSubmit={(event) => { event.preventDefault(); unlock(); }}>
-            <strong><span className="pin-icon">♡</span><span>Birthday password<small>masukkan tanggal ulang tahunmu</small></span></strong><div className="pin-dots" aria-label={`${pin.length} dari 4 angka terisi`}>{[0, 1, 2, 3].map((index) => <span key={index} className={pin[index] ? 'filled' : ''}>{pin[index] ?? '·'}</span>)}</div>
+            <strong><span className="pin-icon">✦</span><span>Birthday password<small>masukkan tanggal ulang tahunmu</small></span></strong><div className="pin-dots" aria-label={`${pin.length} dari 4 angka terisi`}>{[0, 1, 2, 3].map((index) => <span key={index} className={pin[index] ? 'filled' : ''}>{pin[index] ?? '·'}</span>)}</div>
             <div className="keypad">{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => <button type="button" key={number} aria-label={`Angka ${number}`} onClick={() => { setPin((value) => `${value}${number}`.slice(0, 4)); setPinError(false); }}>{number}</button>)}<button type="button" aria-label="Hapus angka terakhir" onClick={() => setPin((value) => value.slice(0, -1))}>⌫</button><button type="button" aria-label="Angka 0" onClick={() => setPin((value) => `${value}0`.slice(0, 4))}>0</button><button type="submit" aria-label="Buka kejutan" disabled={pin.length !== 4}>↗</button></div>
             <p className="form-message" role="alert">{pinError ? 'PIN belum tepat, coba lagi ya.' : <><span className="hint-label">hint</span>Petunjuk: PIN demo 4 angka.</>}</p>
           </form>
         </div>
-        <div className="intro-art"><div className="bouquet-halo" /><Image className="intro-bouquet" src="/img/newbuket.png" alt="Buket bunga untuk Nopalpante" width={500} height={552} priority unoptimized /><span className="float flower-one">✿</span><span className="float flower-two">✦</span><span className="bouquet-note">picked just for you</span></div>
+        <div className="intro-art"><div className="bouquet-halo" /><Image className="intro-bouquet" src="/img/newbuket.png" alt="Buket bunga untuk Nopal" width={500} height={552} priority unoptimized /><span className="float flower-one">✿</span><span className="float flower-two">✦</span><span className="bouquet-note">picked just for you</span></div>
         <span className="intro-footnote">ONLY THE RIGHT PERSON CAN ENTER</span>
       </section>}
 
-      {scene === 'gift' && <section className={`scene center-scene gift-scene ${giftOpen ? 'gift-opened' : ''}`}><div className="gift-ambient" aria-hidden="true">{introMotifs.map((motif, index) => <span className="ambient-motif" key={index} style={{ left: motif.left, top: motif.top, animationDelay: `${(index % 6) * -0.9}s` }}>{motif.icon}</span>)}</div><span className="kicker gift-eyebrow">{giftOpen ? `YOU DID IT, ${gift.recipient} SAYANG!` : '02 · ADA SESUATU UNTUKMU'}</span><h1>{giftOpen ? <>A bouquet <em>just for you.</em></> : <>A little gift <em>for you.</em></>}</h1><div className="gift-box-scene"><div className="gift-confetti" aria-hidden="true">{giftConfetti.map((piece, index) => <span key={index} className="confetti-piece" style={{ '--confetti-x': piece.x, '--confetti-delay': piece.delay, '--confetti-duration': piece.duration, '--confetti-rotation': piece.rotation, '--confetti-hue': piece.hue } as React.CSSProperties} />)}</div><Image className="gift-bouquet" src="/img/newbuket.png" alt="Buket bunga kejutan untuk Nopalpante" width={440} height={486} unoptimized /><button className="gift-box" aria-label="Buka kotak hadiah" onClick={openFirstGift} disabled={giftOpen}><span className="gift-box-lid"><i /></span><span className="gift-box-body"><i /></span>{!giftOpen && <strong>BUKA HADIAH</strong>}</button></div><div className="gift-reveal-copy"><p>{giftOpen ? 'Setiap bunga membawa satu doa baik untuk ulang tahunmu.' : 'Ketuk kotaknya untuk melihat kejutanmu.'}</p>{giftOpen && <button className="primary-button" onClick={() => beginCatch('flowers')}>Ambil bunganya <span>→</span></button>}</div></section>}
+      {scene === 'gift' && <section className={`scene center-scene gift-scene ${giftOpen ? 'gift-opened' : ''}`}><div className="gift-ambient" aria-hidden="true">{introMotifs.map((motif, index) => <span className="ambient-motif" key={index} style={{ left: motif.left, top: motif.top, animationDelay: `${(index % 6) * -0.9}s` }}>{motif.icon}</span>)}</div><span className="kicker gift-eyebrow">{giftOpen ? `YOU DID IT, ${gift.recipient}!` : '02 · ADA SESUATU UNTUKMU'}</span><h1>{giftOpen ? <>A bouquet <em>just for you.</em></> : <>A little gift <em>for you.</em></>}</h1><div className="gift-box-scene"><div className="gift-confetti" aria-hidden="true">{giftConfetti.map((piece, index) => <span key={index} className="confetti-piece" style={{ '--confetti-x': piece.x, '--confetti-delay': piece.delay, '--confetti-duration': piece.duration, '--confetti-rotation': piece.rotation, '--confetti-hue': piece.hue } as React.CSSProperties} />)}</div><Image className="gift-bouquet" src="/img/newbuket.png" alt="Buket bunga kejutan untuk Nopal" width={440} height={486} unoptimized /><button className="gift-box" aria-label="Buka kotak hadiah" onClick={openFirstGift} disabled={giftOpen}><span className="gift-box-lid"><i /></span><span className="gift-box-body"><i /></span>{!giftOpen && <strong>BUKA HADIAH</strong>}</button></div><div className="gift-reveal-copy"><p>{giftOpen ? 'Setiap bunga membawa satu doa baik untuk ulang tahunmu.' : 'Ketuk kotaknya untuk melihat kejutanmu.'}</p>{giftOpen && <button className="primary-button" onClick={() => beginCatch('flowers')}>Ambil bunganya <span>→</span></button>}</div></section>}
 
       {scene === 'flowers' && <FlowerCatchScene caught={caught} onCatch={catchItem} onRetry={() => beginCatch('flowers')} onComplete={() => go('envelope')} />}
       {scene === 'catch-again' && <CatchScene key={scene} caught={caught} onCatch={catchItem} onComplete={() => go('delivery')} onSkip={() => go('delivery')} />}
@@ -307,7 +307,7 @@ export default function Home() {
 
       {scene === 'memories' && <section className="scene memories-scene"><div className="section-heading"><span className="kicker">05–06 · beberapa kenangan manis</span><h1>Empat potongan cerita,<br /><em>satu lagu untukmu.</em></h1><p>Foto-foto bisa diganti nanti. Untuk sekarang, simpan dulu ruang kecil ini.</p></div>
         <div className="memories-layout"><div className="photo-stack" aria-label="Empat slot foto kenangan">{gift.photos.map((photo, index) => <article className={`photo-card photo-${index + 1}`} key={photo.label}><div className="photo-placeholder"><span>0{index + 1}</span><span className="placeholder-heart">♡</span><small>foto kenangan</small></div><p>{photo.label}</p></article>)}</div>
-          <div className="video-card"><div className="video-heading"><span>NOW PLAYING</span><strong>kenangan favorit</strong></div><div className="video-frame"><iframe id="nopalpante-youtube" title="Video kenangan untuk Nopalpante" src={`https://www.youtube.com/embed/${gift.videoId}?enablejsapi=1&playsinline=1&rel=0`} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /></div><div className="video-note"><span className="video-dot" />{videoPlaying ? 'Musik halaman berhenti selama video diputar' : 'Lagu halaman tersedia di pemutar bawah'}</div></div></div>
+          <div className="video-card"><div className="video-heading"><span>NOW PLAYING</span><strong>kenangan favorit</strong></div><div className="video-frame"><iframe id="nopalpante-youtube" title="Video kenangan untuk Nopal" src={`https://www.youtube.com/embed/${gift.videoId}?enablejsapi=1&playsinline=1&rel=0`} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /></div><div className="video-note"><span className="video-dot" />{videoPlaying ? 'Musik halaman berhenti selama video diputar' : 'Lagu halaman tersedia di pemutar bawah'}</div></div></div>
         <button className="primary-button" onClick={() => go('candle')}>Lanjutkan ceritanya <span>→</span></button>
       </section>}
 
@@ -315,7 +315,7 @@ export default function Home() {
 
       {scene === 'wish' && <section className={`scene center-scene gift-scene wish-scene ${wishGiftOpen ? 'gift-opened' : ''}`}>
         {!wishGiftRevealed ? <>
-          <span className="kicker gift-eyebrow">{wishGiftOpen ? `YOU DID IT, ${gift.recipient} SAYANG!` : '08 · SEBUAH KADO KECIL UNTUKMU'}</span>
+          <span className="kicker gift-eyebrow">{wishGiftOpen ? `YOU DID IT, ${gift.recipient}!` : '08 · SEBUAH KADO KECIL UNTUKMU'}</span>
           <h1>{wishGiftOpen ? <>A bouquet <em>just for you.</em></> : <>Satu lagi <em>untukmu.</em></>}</h1>
           <div className="gift-box-scene">
             <div className="gift-confetti" aria-hidden="true">{giftConfetti.map((piece, index) => <span key={index} className="confetti-piece" style={{ '--confetti-x': piece.x, '--confetti-delay': piece.delay, '--confetti-duration': piece.duration, '--confetti-rotation': piece.rotation, '--confetti-hue': piece.hue } as React.CSSProperties} />)}</div>
@@ -325,16 +325,34 @@ export default function Home() {
           <div className="gift-reveal-copy"><p>{wishGiftOpen ? 'Ada surat kecil yang ingin kusampaikan.' : 'Ketuk kotaknya untuk melihat kejutanmu.'}</p></div>
         </> : <>
           <span className="kicker">08 · dari {gift.sender}, untukmu</span>
-          <div className="message-paper wish-gift-message"><span className="paper-heart">♡</span><h1>Selamat ulang tahun,<br /><em>{gift.recipient}.</em></h1><p>Semoga hari-harimu dipenuhi hal baik, tawa yang tulus, dan orang-orang yang selalu mendukungmu. Terima kasih sudah menjadi dirimu sendiri. Semoga semua yang sedang kamu usahakan tumbuh dengan indah.</p><p className="message-signoff">Dengan sayang,<br /><strong>{gift.sender}</strong></p></div>
-          <button className="primary-button" onClick={() => { setPicnicCount(0); setPicnicPlaced([]); picnicPlacedRef.current = []; setSelectedPicnic(null); go('picnic'); }}>Masih ada kejutan kecil untukmu <span>→</span></button>
+          <div className="message-paper wish-gift-message"><span className="paper-heart">♡</span><h1>Selamat ulang tahun,<br /><em>{gift.recipient}.</em></h1><p>Semoga hari-harimu dipenuhi hal baik, tawa yang tulus, dan orang-orang yang selalu mendukungmu. Terima kasih sudah menjadi dirimu sendiri. Semoga semua yang sedang kamu usahakan tumbuh dengan indah.</p><p className="message-signoff">Salam,<br /><strong>{gift.sender}</strong></p></div>
+          <button className="primary-button" onClick={() => go('portrait')}>Masih ada kejutan kecil untukmu <span>→</span></button>
         </>}
       </section>}
 
-      {scene === 'picnic' && <section className="scene center-scene game-scene picnic-scene"><span className="kicker">09 · piknik kecil</span><h1>Siapkan <em>piknik.</em></h1><p>Tarik kudapan ke tempat yang tepat di atas tikar.</p><div className="picnic-board"><div className="picnic-items" aria-label="Kudapan untuk piknik">{picnicItems.map((item, index) => !picnicPlaced.includes(index) && <button key={item.label} className={selectedPicnic === index ? 'selected' : ''} aria-pressed={selectedPicnic === index} onPointerDown={() => { setSelectedPicnic(index); setPicnicError(false); }} onClick={() => { setSelectedPicnic(index); setPicnicError(false); }}><span>{item.icon}</span><small>{item.label}</small></button>)}</div><div className="picnic-mat" aria-label="Tikar dan kategori piknik">{picnicCategories.map((category) => { const itemIndex = picnicPlaced.find((index) => picnicItems[index].category === category); return <button key={category} className={itemIndex !== undefined ? 'filled' : ''} onPointerUp={() => placePicnicItem(category)} onClick={() => placePicnicItem(category)} aria-label={`Tempatkan ke ${category.toLowerCase()}`}><span>{itemIndex === undefined ? category : <><b>{picnicItems[itemIndex].icon}</b><small>{category}</small></>}</span></button>; })}</div></div><p className="live-message" aria-live="polite">{picnicCount === picnicItems.length ? 'Pikniknya siap! 🕷️' : picnicError ? 'Belum cocok—coba tempat yang lain, ya.' : selectedPicnic === null ? `${picnicCount}/${picnicItems.length} kudapan tersusun` : `Lepaskan ${picnicItems[selectedPicnic].label.toLowerCase()} di tempat yang sesuai.`}</p>{picnicCount === picnicItems.length ? <p className="live-message">Berikutnya: tangkap tujuh kejutan ✦</p> : <button className="secondary-button picnic-skip" onClick={() => { setCaught([]); go('catch-again'); }}>Lewati permainan →</button>}</section>}
+      {scene === 'portrait' && <section className="scene center-scene portrait-scene">
+        <div className="portrait-content">
+          <div className="portrait-frame">
+            <div className="portrait-placeholder" role="img" aria-label="Placeholder foto Nopal">
+              <span className="portrait-placeholder-label">FOTO NOPAL</span>
+              <span className="portrait-placeholder-star" aria-hidden="true">✦</span>
+              <small>foto Nopal akan tampil di sini</small>
+            </div>
+          </div>
+          <article className="message-paper portrait-letter">
+            <h2>Selamat ulang tahun, Nopal.</h2>
+            <p>Semoga langkahmu di usia yang baru ini dipenuhi hal baik, tawa yang tulus, dan harapan yang satu per satu menemukan jalannya. Terus tumbuh dengan bahagia dan bangga menjadi dirimu sendiri.</p>
+            <p className="message-signoff">Dengan hangat,<br /><strong>{gift.sender}</strong></p>
+          </article>
+        </div>
+        <button className="primary-button" onClick={() => { setPicnicCount(0); setPicnicPlaced([]); picnicPlacedRef.current = []; setSelectedPicnic(null); go('picnic'); }}>Lanjut ke piknik <span>→</span></button>
+      </section>}
+
+      {scene === 'picnic' && <section className="scene center-scene game-scene picnic-scene"><span className="kicker">10 · piknik kecil</span><h1>Siapkan <em>piknik.</em></h1><p>Tarik kudapan ke tempat yang tepat di atas tikar.</p><div className="picnic-board"><div className="picnic-items" aria-label="Kudapan untuk piknik">{picnicItems.map((item, index) => !picnicPlaced.includes(index) && <button key={item.label} className={selectedPicnic === index ? 'selected' : ''} aria-pressed={selectedPicnic === index} onPointerDown={() => { setSelectedPicnic(index); setPicnicError(false); }} onClick={() => { setSelectedPicnic(index); setPicnicError(false); }}><span>{item.icon}</span><small>{item.label}</small></button>)}</div><div className="picnic-mat" aria-label="Tikar dan kategori piknik">{picnicCategories.map((category) => { const itemIndex = picnicPlaced.find((index) => picnicItems[index].category === category); return <button key={category} className={itemIndex !== undefined ? 'filled' : ''} onPointerUp={() => placePicnicItem(category)} onClick={() => placePicnicItem(category)} aria-label={`Tempatkan ke ${category.toLowerCase()}`}><span>{itemIndex === undefined ? category : <><b>{picnicItems[itemIndex].icon}</b><small>{category}</small></>}</span></button>; })}</div></div><p className="live-message" aria-live="polite">{picnicCount === picnicItems.length ? 'Pikniknya siap! 🕷️' : picnicError ? 'Belum cocok—coba tempat yang lain, ya.' : selectedPicnic === null ? `${picnicCount}/${picnicItems.length} kudapan tersusun` : `Lepaskan ${picnicItems[selectedPicnic].label.toLowerCase()} di tempat yang sesuai.`}</p>{picnicCount === picnicItems.length ? <p className="live-message">Berikutnya: tangkap tujuh kejutan ✦</p> : <button className="secondary-button picnic-skip" onClick={() => { setCaught([]); go('catch-again'); }}>Lewati permainan →</button>}</section>}
 
       {scene === 'delivery' && <MazeScene onComplete={() => go('complete')} />}
 
-      {scene === 'complete' && <section className="scene center-scene complete-scene"><Image className="spider ending-spider" src={spider} alt="Laba-laba kecil ikut merayakan" width={130} height={120}/><span className="kicker">cerita kecil ini selesai</span><h1>Semoga harimu<br /><em>seindah dirimu.</em></h1><p>Selamat ulang tahun, {gift.recipient}.<br />Dengan sayang, {gift.sender}.</p><button className="primary-button" onClick={reset}>Ulangi perjalanan <span>↺</span></button></section>}
+      {scene === 'complete' && <section className="scene center-scene complete-scene"><Image className="spider ending-spider" src={spider} alt="Laba-laba kecil ikut merayakan" width={130} height={120}/><span className="kicker">cerita kecil ini selesai</span><h1>Semoga harimu<br /><em>seindah dirimu.</em></h1><p>Selamat ulang tahun, {gift.recipient}.<br />Salam, {gift.sender}.</p><button className="primary-button" onClick={reset}>Ulangi perjalanan <span>↺</span></button></section>}
 
       {showMusic && <aside className="music-dock" aria-label="Pemutar musik"><button className="music-play" onClick={async () => { if (!audioRef.current) return; if (musicOn) { audioRef.current.pause(); setMusicOn(false); } else await startMusic(); }} aria-label={musicOn ? 'Jeda musik' : 'Putar musik'}>{musicOn ? 'Ⅱ' : '▶'}</button><div className="music-copy"><span>{musicOn ? 'sedang diputar' : 'lagu untukmu'}</span><strong>Anugerah Terindah</strong></div><button className="mute-button" onClick={() => setMuted((value) => !value)} aria-label={muted ? 'Nyalakan suara' : 'Bisukan musik'}>{muted ? '◌' : '♪'}</button></aside>}
       {showMusic && videoPlaying && <button className="resume-music" onClick={() => void startMusic()}>Putar musik halaman</button>}
@@ -498,7 +516,7 @@ function CatchScene({ caught, onCatch, onComplete, onSkip }: { caught: number[];
   }, []);
 
   return <section className="scene center-scene game-scene catch-scene surprise-catch-scene">
-    <span className="kicker">10 · tangkap 7 kejutan</span>
+    <span className="kicker">11 · tangkap 7 kejutan</span>
     <h1>Tangkap <em>7 kejutan.</em></h1>
     <p>Geser laba-laba dengan jari, mouse, atau tombol panah untuk menangkapnya.</p>
     <div className="catch-hud"><strong>{Math.min(caught.length, 7)}/7 tertangkap</strong><span>♡ ✦</span><span>kejutan kecil</span></div>
@@ -541,7 +559,7 @@ function MazeScene({ onComplete }: { onComplete: () => void }) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [move]);
   return <section className="scene center-scene game-scene maze-scene">
-    <span className="kicker">11 · labirin kecil</span>
+    <span className="kicker">12 · labirin kecil</span>
     <h1>Bantu laba-laba kecil<br /><em>menemukan hadiahnya.</em></h1>
     <p>Ikuti jalan biru sampai ke hadiah. Dinding akan menahan langkahmu.</p>
     <div className={`maze-shell ${completed ? 'is-complete' : ''}`}>

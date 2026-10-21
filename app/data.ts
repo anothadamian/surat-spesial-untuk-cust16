@@ -1,5 +1,5 @@
 export const gift = {
-  recipient: 'nopalpante',
+  recipient: 'nopal',
   sender: 'putriimut',
   pin: '1234',
   videoId: 'o25_Tn8BnFM',

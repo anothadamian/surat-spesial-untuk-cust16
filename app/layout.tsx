@@ -6,9 +6,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (productionHost ? `https://$
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'Untuk Nopalpante — cerita ulang tahun kecil',
-  description: 'Kejutan ulang tahun kecil dari Putriimut untuk Nopalpante.',
-  openGraph: { title: 'Untuk Nopalpante', description: 'Kejutan ulang tahun kecil dari Putriimut.' },
-  twitter: { card: 'summary', title: 'Untuk Nopalpante', description: 'Kejutan ulang tahun kecil dari Putriimut.' },
+  title: 'Untuk Nopal — cerita ulang tahun kecil',
+  description: 'Kejutan ulang tahun kecil dari Putriimut untuk Nopal.',
+  openGraph: { title: 'Untuk Nopal', description: 'Kejutan ulang tahun kecil dari Putriimut.' },
+  twitter: { card: 'summary', title: 'Untuk Nopal', description: 'Kejutan ulang tahun kecil dari Putriimut.' },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="id"><body>{children}</body></html>; }

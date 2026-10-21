@@ -1,10 +1,25 @@
 import { expect, test } from '@playwright/test';
 
+for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
+  test(`loading bouquet stays clear of the text at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('status', { name: 'Memuat kejutan ulang tahun' })).toBeVisible();
+    const bouquet = await page.locator('.loading-bouquet').boundingBox();
+    const eyebrow = await page.locator('.loading-eyebrow').boundingBox();
+    const heading = await page.locator('.loading-content h1').boundingBox();
+    expect(bouquet && eyebrow && heading).toBeTruthy();
+    expect(bouquet!.width).toBeLessThanOrEqual(viewport.width === 390 ? 150 : 175);
+    expect(bouquet!.y + bouquet!.height).toBeLessThanOrEqual(eyebrow!.y);
+    expect(bouquet!.y + bouquet!.height).toBeLessThanOrEqual(heading!.y);
+  });
+}
+
 for (const viewport of [{ width: 320, height: 740 }, { width: 1280, height: 800 }]) {
   test(`fits the ${viewport.width}px viewport without horizontal overflow`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: /nopalpante/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /nopal/i })).toBeVisible();
     expect(await page.locator('body').evaluate((body) => body.scrollWidth)).toBeLessThanOrEqual(viewport.width);
     if (viewport.width === 320) {
       const keypad = await page.locator('.keypad').boundingBox();
