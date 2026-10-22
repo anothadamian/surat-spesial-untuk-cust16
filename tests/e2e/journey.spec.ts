@@ -63,8 +63,8 @@ test('the intro shows the new bouquet instead of the spider', async ({ page }) =
   await expect(page.locator('.intro-sparkles .ambient-motif').first()).toHaveCSS('animation-name', 'ambient-drift');
 });
 
-test('birthday PIN 0301 opens the gift screen and the gift starts the flower game', async ({ page }) => {
-  await enterPin(page, '0301');
+test('birthday PIN 0311 opens the gift screen and the gift starts the flower game', async ({ page }) => {
+  await enterPin(page, '0311');
   await expect(page.getByRole('heading', { name: /a little gift for you/i })).toBeVisible();
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await expect(page.locator('.gift-eyebrow')).toHaveText(/YOU DID IT, nopal!/i);
@@ -73,7 +73,7 @@ test('birthday PIN 0301 opens the gift screen and the gift starts the flower gam
 });
 
 test('opening the gift reveals the bouquet and confetti before continuing', async ({ page }) => {
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await expect(page.locator('.gift-bouquet')).not.toBeVisible();
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await expect(page.locator('.gift-scene')).toHaveClass(/gift-opened/);
@@ -93,7 +93,7 @@ test('only opening the gift plays Kienan-style sparkle, not regular buttons or m
       return createOscillator.call(this);
     };
   });
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await page.evaluate(() => { (window as unknown as Window & { __nopalpanteOscillatorCount: number }).__nopalpanteOscillatorCount = 0; });
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await expect.poll(() => page.evaluate(() => (window as unknown as Window & { __nopalpanteOscillatorCount: number }).__nopalpanteOscillatorCount)).toBe(3);
@@ -104,7 +104,7 @@ test('only opening the gift plays Kienan-style sparkle, not regular buttons or m
 
 test('the opened gift and continue button keep comfortable bottom spacing on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   const continueButton = page.getByRole('button', { name: /ambil bunganya/i });
   await expect(continueButton).toBeVisible();
@@ -114,7 +114,7 @@ test('the opened gift and continue button keep comfortable bottom spacing on mob
 });
 
 test('catching all six flowers reveals the envelope, then the four-chat video page', async ({ page }) => {
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await catchSixFlowers(page);
   await expect(page.getByRole('heading', { name: /tekan amplopnya/i })).toBeVisible();
@@ -127,7 +127,7 @@ test('catching all six flowers reveals the envelope, then the four-chat video pa
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('.memories-scene .photo-hint')).toHaveText('Tekan foto untuk melihat lebih jelas');
-  await expect(page.locator('.photo-2 > p')).toHaveText('Pertemanan sejati = momen nopal bilang temen');
+  await expect(page.locator('.photo-2 > p')).toHaveText('momen nopal bilang temen');
   await expect(page.locator('.photo-card > p').first()).toHaveCSS('font-size', '12px');
   await page.getByRole('button', { name: 'Perbesar foto: Pertama ketemu' }).click();
   await expect(page.getByRole('dialog', { name: 'Pertama ketemu' })).toBeVisible();
@@ -144,7 +144,7 @@ test('catching all six flowers reveals the envelope, then the four-chat video pa
 });
 
 test('the envelope visibly opens before moving to the memories page', async ({ page }) => {
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await catchSixFlowers(page);
   const envelope = page.getByRole('button', { name: 'Buka amplop' });
@@ -165,7 +165,7 @@ test('blowing out the candle shows a gentle confetti celebration', async ({ page
       return createOscillator.call(this);
     };
   });
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await catchSixFlowers(page);
   await page.getByRole('button', { name: 'Buka amplop' }).click();
@@ -255,7 +255,7 @@ test('blowing out the candle shows a gentle confetti celebration', async ({ page
 
 test('picnic, catcher, maze, and Dlynn-style word search lead into the ending', async ({ page }) => {
   test.setTimeout(90000);
-  await enterPin(page, '0301');
+  await enterPin(page, '0311');
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await catchSixFlowers(page);
   await page.getByRole('button', { name: 'Buka amplop' }).click();

@@ -31,7 +31,7 @@ for (const viewport of [{ width: 320, height: 740 }, { width: 1280, height: 800 
 test('four chat photos and the visible video fit the narrow mobile screen', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto('/');
-  for (const digit of '0301') await page.getByRole('button', { name: `Angka ${digit}` }).click();
+  for (const digit of '0311') await page.getByRole('button', { name: `Angka ${digit}` }).click();
   await page.getByRole('button', { name: 'Buka kejutan' }).click();
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await page.getByRole('button', { name: /ambil bunganya/i }).click();
@@ -54,7 +54,7 @@ for (const viewport of [{ width: 320, height: 640 }, { width: 390, height: 844 }
     await page.setViewportSize({ width: viewport.width, height: 740 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-    for (const [index, digit] of [...'0301'].entries()) {
+    for (const [index, digit] of [...'0311'].entries()) {
       await page.getByRole('button', { name: `Angka ${digit}` }).click();
       await expect(page.locator('.pin-dots')).toHaveAttribute('aria-label', `${index + 1} dari 4 angka terisi`);
     }
@@ -92,7 +92,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 
 test('gift scene uses a navy animated background', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  for (const digit of '0301') await page.getByRole('button', { name: `Angka ${digit}` }).click();
+  for (const digit of '0311') await page.getByRole('button', { name: `Angka ${digit}` }).click();
   await page.getByRole('button', { name: 'Buka kejutan' }).click();
   const giftScene = page.locator('.gift-scene');
   await expect(giftScene).toBeVisible();
@@ -103,7 +103,7 @@ test('gift scene uses a navy animated background', async ({ page }) => {
 test('scene transition uses a longer spider swarm curtain', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  for (const digit of '0301') await page.getByRole('button', { name: `Angka ${digit}` }).click();
+  for (const digit of '0311') await page.getByRole('button', { name: `Angka ${digit}` }).click();
   await page.getByRole('button', { name: 'Buka kejutan' }).click();
   const curtain = page.locator('.transition-spider');
   await expect(curtain.locator('.transition-spider-bloom')).toHaveCount(36);
@@ -114,7 +114,7 @@ test('scene transition uses a longer spider swarm curtain', async ({ page }) => 
 test('flower-catching game fits one mobile screen and starts with the spider catcher', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  for (const digit of '0301') await page.getByRole('button', { name: `Angka ${digit}` }).click();
+  for (const digit of '0311') await page.getByRole('button', { name: `Angka ${digit}` }).click();
   await page.getByRole('button', { name: 'Buka kejutan' }).click();
   await page.getByRole('button', { name: 'Buka kotak hadiah' }).click();
   await page.getByRole('button', { name: /ambil bunganya/i }).click();
