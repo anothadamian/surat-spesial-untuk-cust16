@@ -1,14 +1,14 @@
 export const gift = {
   recipient: 'nopal',
   sender: 'putriimut',
-  pin: '1234',
+  pin: '0301',
   videoId: 'o25_Tn8BnFM',
   music: '/music/anugerah-terindah.mp3',
   photos: [
-    { label: 'Momen pertama', caption: 'Satu momen kecil yang ingin disimpan.' },
-    { label: 'Tawa bersama', caption: 'Semoga selalu ada alasan untuk tertawa.' },
-    { label: 'Hari spesial', caption: 'Hari ini tentang kamu.' },
-    { label: 'Kenangan favorit', caption: 'Cerita baik yang terus bertambah.' },
+    { label: 'Pertama ketemu', src: '/img/nopal-chat-01.jpeg' },
+    { label: 'Pertemanan sejati', src: '/img/nopal-chat-02.jpeg' },
+    { label: 'Menunggu princess', src: '/img/nopal-chat-03.jpeg' },
+    { label: 'Momen babu nyariin princess', src: '/img/nopal-chat-04.jpeg' },
   ],
 } as const;
 

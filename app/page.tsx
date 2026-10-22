@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { flowers, gift, picnicCategories, picnicItems } from './data';
 
-type Scene = 'intro' | 'gift' | 'flowers' | 'envelope' | 'memories' | 'candle' | 'wish' | 'portrait' | 'picnic' | 'catch-again' | 'delivery' | 'complete';
+type Scene = 'intro' | 'gift' | 'flowers' | 'envelope' | 'memories' | 'candle' | 'wish' | 'portrait' | 'picnic' | 'catch-again' | 'delivery' | 'word-search' | 'complete';
 type YTPlayer = { destroy: () => void };
 type YTState = { Player: new (id: string, options: { events: { onStateChange: (event: { data: number }) => void } }) => YTPlayer };
 declare global { interface Window { YT?: YTState; onYouTubeIframeAPIReady?: () => void } }
@@ -40,7 +40,7 @@ const transitionSpiders = Array.from({ length: 36 }, (_, index) => {
     delay: `${Math.min(0.13, distanceFromCenter * 0.018)}s`,
   };
 });
-const sceneOrder: Scene[] = ['intro', 'gift', 'flowers', 'envelope', 'memories', 'candle', 'wish', 'portrait', 'picnic', 'catch-again', 'delivery', 'complete'];
+const sceneOrder: Scene[] = ['intro', 'gift', 'flowers', 'envelope', 'memories', 'candle', 'wish', 'portrait', 'picnic', 'catch-again', 'delivery', 'word-search', 'complete'];
 
 export default function Home() {
   const [scene, setScene] = useState<Scene>('intro');
@@ -66,7 +66,9 @@ export default function Home() {
   const [selectedPicnic, setSelectedPicnic] = useState<number | null>(null);
   const [picnicError, setPicnicError] = useState(false);
   const [transition, setTransition] = useState(false);
+  const [activePhoto, setActivePhoto] = useState<{ src: string; alt: string; label: string } | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const lightboxCloseRef = useRef<HTMLButtonElement>(null);
   const candleTimer = useRef<number | null>(null);
   const candleProgressValue = useRef(0);
   const wishMessageTimer = useRef<number | null>(null);
@@ -98,6 +100,23 @@ export default function Home() {
     document.body.style.overflow = siteLoading ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [siteLoading]);
+
+  useEffect(() => {
+    if (!activePhoto) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setActivePhoto(null);
+    };
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', closeOnEscape);
+    lightboxCloseRef.current?.focus();
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', closeOnEscape);
+      previousFocus?.focus();
+    };
+  }, [activePhoto]);
 
   const go = useCallback((next: Scene) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -291,7 +310,7 @@ export default function Home() {
           <form className="pin-card" onSubmit={(event) => { event.preventDefault(); unlock(); }}>
             <strong><span className="pin-icon">✦</span><span>Birthday password<small>masukkan tanggal ulang tahunmu</small></span></strong><div className="pin-dots" aria-label={`${pin.length} dari 4 angka terisi`}>{[0, 1, 2, 3].map((index) => <span key={index} className={pin[index] ? 'filled' : ''}>{pin[index] ?? '·'}</span>)}</div>
             <div className="keypad">{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => <button type="button" key={number} aria-label={`Angka ${number}`} onClick={() => { setPin((value) => `${value}${number}`.slice(0, 4)); setPinError(false); }}>{number}</button>)}<button type="button" aria-label="Hapus angka terakhir" onClick={() => setPin((value) => value.slice(0, -1))}>⌫</button><button type="button" aria-label="Angka 0" onClick={() => setPin((value) => `${value}0`.slice(0, 4))}>0</button><button type="submit" aria-label="Buka kejutan" disabled={pin.length !== 4}>↗</button></div>
-            <p className="form-message" role="alert">{pinError ? 'PIN belum tepat, coba lagi ya.' : <><span className="hint-label">hint</span>Petunjuk: PIN demo 4 angka.</>}</p>
+            <p className="form-message" role="alert">{pinError ? 'PIN belum tepat, coba lagi ya.' : <><span className="hint-label">hint</span>Petunjuk: Tanggal ulang tahun kamu.</>}</p>
           </form>
         </div>
         <div className="intro-art"><div className="bouquet-halo" /><Image className="intro-bouquet" src="/img/newbuket.png" alt="Buket bunga untuk Nopal" width={500} height={552} priority unoptimized /><span className="float flower-one">✿</span><span className="float flower-two">✦</span><span className="bouquet-note">picked just for you</span></div>
@@ -305,8 +324,8 @@ export default function Home() {
 
       {scene === 'envelope' && <section className="scene center-scene envelope-scene"><span className="kicker">04 · ada surat untukmu</span><h1>Tekan amplopnya,<br /><em>pelan-pelan.</em></h1><button className={`envelope-button ${envelopeOpening ? 'opening' : ''}`} onClick={openEnvelope} disabled={envelopeOpening} aria-label="Buka amplop"><span className="envelope-back" /><span className="envelope-letter">♥</span><span className="envelope-flap" /><span className="envelope-front" /><Image className="spider envelope-spider" src={spider} alt="Laba-laba kecil menjaga amplop" width={80} height={80} /></button><p>Di dalamnya ada kenangan dan sebuah lagu.</p></section>}
 
-      {scene === 'memories' && <section className="scene memories-scene"><div className="section-heading"><span className="kicker">05–06 · beberapa kenangan manis</span><h1>Empat potongan cerita,<br /><em>satu lagu untukmu.</em></h1><p>Foto-foto bisa diganti nanti. Untuk sekarang, simpan dulu ruang kecil ini.</p></div>
-        <div className="memories-layout"><div className="photo-stack" aria-label="Empat slot foto kenangan">{gift.photos.map((photo, index) => <article className={`photo-card photo-${index + 1}`} key={photo.label}><div className="photo-placeholder"><span>0{index + 1}</span><span className="placeholder-heart">♡</span><small>foto kenangan</small></div><p>{photo.label}</p></article>)}</div>
+      {scene === 'memories' && <section className="scene memories-scene"><div className="section-heading"><span className="kicker">05–06 · beberapa chat manis</span><h1>Empat chat spesial<br /><em>seperti lagu untuk elu.</em></h1></div>
+        <div className="memories-layout"><div className="photo-stack" aria-label="Empat slot chat kenangan">{gift.photos.map((photo, index) => <article className={`photo-card photo-${index + 1}`} key={photo.label}><button className="memory-photo memory-photo-trigger" type="button" aria-label={`Perbesar foto: ${photo.label}`} onClick={() => setActivePhoto({ src: photo.src, alt: `Chat kenangan: ${photo.label}`, label: photo.label })}><Image src={photo.src} alt={`Chat kenangan: ${photo.label}`} width={720} height={1233} unoptimized /></button><p>{photo.label}</p></article>)}</div>
           <div className="video-card"><div className="video-heading"><span>NOW PLAYING</span><strong>kenangan favorit</strong></div><div className="video-frame"><iframe id="nopalpante-youtube" title="Video kenangan untuk Nopal" src={`https://www.youtube.com/embed/${gift.videoId}?enablejsapi=1&playsinline=1&rel=0`} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /></div><div className="video-note"><span className="video-dot" />{videoPlaying ? 'Musik halaman berhenti selama video diputar' : 'Lagu halaman tersedia di pemutar bawah'}</div></div></div>
         <button className="primary-button" onClick={() => go('candle')}>Lanjutkan ceritanya <span>→</span></button>
       </section>}
@@ -325,23 +344,21 @@ export default function Home() {
           <div className="gift-reveal-copy"><p>{wishGiftOpen ? 'Ada surat kecil yang ingin kusampaikan.' : 'Ketuk kotaknya untuk melihat kejutanmu.'}</p></div>
         </> : <>
           <span className="kicker">08 · dari {gift.sender}, untukmu</span>
-          <div className="message-paper wish-gift-message"><span className="paper-heart">♡</span><h1>Selamat ulang tahun,<br /><em>{gift.recipient}.</em></h1><p>Semoga hari-harimu dipenuhi hal baik, tawa yang tulus, dan orang-orang yang selalu mendukungmu. Terima kasih sudah menjadi dirimu sendiri. Semoga semua yang sedang kamu usahakan tumbuh dengan indah.</p><p className="message-signoff">Salam,<br /><strong>{gift.sender}</strong></p></div>
+          <div className="message-paper wish-gift-message"><span className="paper-heart">♡</span><h1>Selamat ulang tahun,<br /><em>{gift.recipient}.</em></h1><p>semoga hari hari lu dipenuhi hal baik , tawa yang riang , dan orang orang yang lu sayang selalu mendukung lu. makasi udah jadi temen gua yang bener bener temen  , sehat selalu ya bro..</p><p className="message-signoff">Salam,<br /><strong>{gift.sender}</strong></p></div>
           <button className="primary-button" onClick={() => go('portrait')}>Masih ada kejutan kecil untukmu <span>→</span></button>
         </>}
       </section>}
 
       {scene === 'portrait' && <section className="scene center-scene portrait-scene">
         <div className="portrait-content">
-          <div className="portrait-frame">
-            <div className="portrait-placeholder" role="img" aria-label="Placeholder foto Nopal">
-              <span className="portrait-placeholder-label">FOTO NOPAL</span>
-              <span className="portrait-placeholder-star" aria-hidden="true">✦</span>
-              <small>foto Nopal akan tampil di sini</small>
-            </div>
-          </div>
+          <div className="portrait-gallery" aria-label="Tiga foto Nopal">{[
+            { src: '/img/nopal-photo-left.jpeg', alt: 'Foto Nopal sebelah kiri' },
+            { src: '/img/nopal-photo-center.jpeg', alt: 'Foto Nopal di tengah' },
+            { src: '/img/nopal-photo-right.jpeg', alt: 'Foto Nopal sebelah kanan' },
+          ].map((photo) => <button className="portrait-frame portrait-image-trigger" type="button" key={photo.src} aria-label={`Perbesar foto ${photo.alt.replace('Foto Nopal ', '')}`} onClick={() => setActivePhoto({ src: photo.src, alt: photo.alt, label: photo.alt.replace('Foto Nopal ', 'Foto Nopal ') })}><Image className="portrait-image" src={photo.src} alt={photo.alt} width={900} height={1600} unoptimized /></button>)}</div>
           <article className="message-paper portrait-letter">
             <h2>Selamat ulang tahun, Nopal.</h2>
-            <p>Semoga langkahmu di usia yang baru ini dipenuhi hal baik, tawa yang tulus, dan harapan yang satu per satu menemukan jalannya. Terus tumbuh dengan bahagia dan bangga menjadi dirimu sendiri.</p>
+            <p>semoga sehat selalu panjang umur dimurahkan rezeki nya agar bisa teef gua terus  , intinya sehat terus aja dan jangan emosian jadi orang gabaik dan juga jaga kesehatan lu jangan sampe kambuh-kambuh , kalo ada apa-apa look at me gua selalu ada buat lu</p>
             <p className="message-signoff">Dengan hangat,<br /><strong>{gift.sender}</strong></p>
           </article>
         </div>
@@ -350,12 +367,14 @@ export default function Home() {
 
       {scene === 'picnic' && <section className="scene center-scene game-scene picnic-scene"><span className="kicker">10 · piknik kecil</span><h1>Siapkan <em>piknik.</em></h1><p>Tarik kudapan ke tempat yang tepat di atas tikar.</p><div className="picnic-board"><div className="picnic-items" aria-label="Kudapan untuk piknik">{picnicItems.map((item, index) => !picnicPlaced.includes(index) && <button key={item.label} className={selectedPicnic === index ? 'selected' : ''} aria-pressed={selectedPicnic === index} onPointerDown={() => { setSelectedPicnic(index); setPicnicError(false); }} onClick={() => { setSelectedPicnic(index); setPicnicError(false); }}><span>{item.icon}</span><small>{item.label}</small></button>)}</div><div className="picnic-mat" aria-label="Tikar dan kategori piknik">{picnicCategories.map((category) => { const itemIndex = picnicPlaced.find((index) => picnicItems[index].category === category); return <button key={category} className={itemIndex !== undefined ? 'filled' : ''} onPointerUp={() => placePicnicItem(category)} onClick={() => placePicnicItem(category)} aria-label={`Tempatkan ke ${category.toLowerCase()}`}><span>{itemIndex === undefined ? category : <><b>{picnicItems[itemIndex].icon}</b><small>{category}</small></>}</span></button>; })}</div></div><p className="live-message" aria-live="polite">{picnicCount === picnicItems.length ? 'Pikniknya siap! 🕷️' : picnicError ? 'Belum cocok—coba tempat yang lain, ya.' : selectedPicnic === null ? `${picnicCount}/${picnicItems.length} kudapan tersusun` : `Lepaskan ${picnicItems[selectedPicnic].label.toLowerCase()} di tempat yang sesuai.`}</p>{picnicCount === picnicItems.length ? <p className="live-message">Berikutnya: tangkap tujuh kejutan ✦</p> : <button className="secondary-button picnic-skip" onClick={() => { setCaught([]); go('catch-again'); }}>Lewati permainan →</button>}</section>}
 
-      {scene === 'delivery' && <MazeScene onComplete={() => go('complete')} />}
+      {scene === 'delivery' && <MazeScene onComplete={() => go('word-search')} />}
+      {scene === 'word-search' && <WordSearchScene onComplete={() => go('complete')} />}
 
       {scene === 'complete' && <section className="scene center-scene complete-scene"><Image className="spider ending-spider" src={spider} alt="Laba-laba kecil ikut merayakan" width={130} height={120}/><span className="kicker">cerita kecil ini selesai</span><h1>Semoga harimu<br /><em>seindah dirimu.</em></h1><p>Selamat ulang tahun, {gift.recipient}.<br />Salam, {gift.sender}.</p><button className="primary-button" onClick={reset}>Ulangi perjalanan <span>↺</span></button></section>}
 
       {showMusic && <aside className="music-dock" aria-label="Pemutar musik"><button className="music-play" onClick={async () => { if (!audioRef.current) return; if (musicOn) { audioRef.current.pause(); setMusicOn(false); } else await startMusic(); }} aria-label={musicOn ? 'Jeda musik' : 'Putar musik'}>{musicOn ? 'Ⅱ' : '▶'}</button><div className="music-copy"><span>{musicOn ? 'sedang diputar' : 'lagu untukmu'}</span><strong>Anugerah Terindah</strong></div><button className="mute-button" onClick={() => setMuted((value) => !value)} aria-label={muted ? 'Nyalakan suara' : 'Bisukan musik'}>{muted ? '◌' : '♪'}</button></aside>}
       {showMusic && videoPlaying && <button className="resume-music" onClick={() => void startMusic()}>Putar musik halaman</button>}
+      {activePhoto && <div className="photo-lightbox" role="dialog" aria-modal="true" aria-label={activePhoto.label} onClick={() => setActivePhoto(null)}><button className="photo-lightbox-close" type="button" aria-label="Tutup foto besar" ref={lightboxCloseRef} onClick={() => setActivePhoto(null)}>×</button><figure className="photo-lightbox-figure" onClick={(event) => event.stopPropagation()}><Image src={activePhoto.src} alt={activePhoto.alt} width={1600} height={2400} unoptimized /><figcaption>{activePhoto.label}</figcaption></figure></div>}
     </main>
   );
 }
@@ -573,5 +592,137 @@ function MazeScene({ onComplete }: { onComplete: () => void }) {
       <div className="maze-controls" aria-label="Kontrol labirin"><button aria-label="Atas" onClick={() => move('up')}>↑</button><button aria-label="Kiri" onClick={() => move('left')}>←</button><button aria-label="Bawah" onClick={() => move('down')}>↓</button><button aria-label="Kanan" onClick={() => move('right')}>→</button></div>
     </div>
     {completed && <div className="maze-success" role="status"><strong>Hadiah berhasil ditemukan! ✦</strong><p>Laba-laba kecil berhasil sampai tujuan.</p><button className="primary-button" onClick={onComplete}>Selesai <span>♥</span></button></div>}
+  </section>;
+}
+
+type WordCell = { row: number; col: number };
+const wordGridSize = 10;
+const wordSearchWords = [
+  { word: 'BINTANG', start: { row: 2, col: 1 }, step: { row: 0, col: 1 } },
+  { word: 'LANGIT', start: { row: 0, col: 9 }, step: { row: 1, col: 0 } },
+  { word: 'GALAXY', start: { row: 8, col: 1 }, step: { row: -1, col: 1 } },
+];
+const wordSearchGrid = Array.from({ length: wordGridSize }, (_, row) => Array.from({ length: wordGridSize }, (_, col) => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[(row * 17 + col * 13 + row * col * 7 + 11) % 26]));
+wordSearchWords.forEach(({ word, start, step }) => [...word].forEach((letter, index) => { wordSearchGrid[start.row + step.row * index][start.col + step.col * index] = letter; }));
+
+function straightCells(start: WordCell, end: WordCell): WordCell[] {
+  const rowDelta = end.row - start.row;
+  const colDelta = end.col - start.col;
+  if (rowDelta !== 0 && colDelta !== 0 && Math.abs(rowDelta) !== Math.abs(colDelta)) return [];
+  const length = Math.max(Math.abs(rowDelta), Math.abs(colDelta));
+  const rowStep = Math.sign(rowDelta);
+  const colStep = Math.sign(colDelta);
+  return Array.from({ length: length + 1 }, (_, index) => ({ row: start.row + rowStep * index, col: start.col + colStep * index }));
+}
+
+function WordSearchScene({ onComplete }: { onComplete: () => void }) {
+  const [foundWords, setFoundWords] = useState<string[]>([]);
+  const [foundCells, setFoundCells] = useState<string[]>([]);
+  const [selectedCells, setSelectedCells] = useState<WordCell[]>([]);
+  const [hintWord, setHintWord] = useState<string | null>(null);
+  const [hintLineStyle, setHintLineStyle] = useState<React.CSSProperties | null>(null);
+  const [message, setMessage] = useState('Geser dari huruf pertama ke huruf terakhir untuk menemukan kata.');
+  const visibleHintWord = hintWord && !foundWords.includes(hintWord) ? hintWord : null;
+  const gridRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef<WordCell | null>(null);
+  const selectedCellsRef = useRef<WordCell[]>([]);
+
+  useEffect(() => {
+    if (foundWords.length === wordSearchWords.length) return;
+    const timer = window.setTimeout(() => setHintWord(wordSearchWords.find(({ word }) => !foundWords.includes(word))?.word ?? null), 15000);
+    return () => window.clearTimeout(timer);
+  }, [foundWords]);
+
+  useEffect(() => {
+    if (foundWords.length !== wordSearchWords.length) return;
+    const timer = window.setTimeout(onComplete, 850);
+    return () => window.clearTimeout(timer);
+  }, [foundWords, onComplete]);
+
+  useEffect(() => {
+    if (!hintWord || foundWords.includes(hintWord)) return;
+    const placement = wordSearchWords.find(({ word }) => word === hintWord);
+    if (!placement || !gridRef.current) return;
+    const drawLine = () => {
+      const end = { row: placement.start.row + placement.step.row * (placement.word.length - 1), col: placement.start.col + placement.step.col * (placement.word.length - 1) };
+      const selector = ({ row, col }: WordCell) => `.word-search-cell[data-row="${row}"][data-col="${col}"]`;
+      const startCell = gridRef.current?.querySelector(selector(placement.start));
+      const endCell = gridRef.current?.querySelector(selector(end));
+      if (!startCell || !endCell || !gridRef.current) return;
+      const gridBounds = gridRef.current.getBoundingClientRect();
+      const startBounds = startCell.getBoundingClientRect();
+      const endBounds = endCell.getBoundingClientRect();
+      const x1 = startBounds.left + startBounds.width / 2 - gridBounds.left;
+      const y1 = startBounds.top + startBounds.height / 2 - gridBounds.top;
+      const x2 = endBounds.left + endBounds.width / 2 - gridBounds.left;
+      const y2 = endBounds.top + endBounds.height / 2 - gridBounds.top;
+      setHintLineStyle({ left: x1, top: y1, width: Math.hypot(x2 - x1, y2 - y1), transform: `translateY(-50%) rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)` });
+    };
+    drawLine();
+    window.addEventListener('resize', drawLine);
+    return () => window.removeEventListener('resize', drawLine);
+  }, [hintWord, foundWords]);
+
+  const paintSelection = (cells: WordCell[]) => {
+    selectedCellsRef.current = cells;
+    setSelectedCells(cells);
+  };
+
+  const moveSelection = (event: React.PointerEvent<HTMLDivElement>) => {
+    const start = dragStartRef.current;
+    if (!start) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('.word-search-cell');
+    if (!target || !gridRef.current?.contains(target)) return;
+    paintSelection(straightCells(start, { row: Number(target.dataset.row), col: Number(target.dataset.col) }));
+  };
+
+  const finishSelection = () => {
+    const start = dragStartRef.current;
+    if (!start) return;
+    const cells = selectedCellsRef.current;
+    const picked = cells.map(({ row, col }) => wordSearchGrid[row][col]).join('');
+    const match = wordSearchWords.find(({ word }) => word === picked || word === [...picked].reverse().join(''));
+    if (match && !foundWords.includes(match.word)) {
+      const nextFoundWords = [...foundWords, match.word];
+      setFoundWords(nextFoundWords);
+      setFoundCells((current) => [...new Set([...current, ...cells.map(({ row, col }) => `${row}-${col}`)])]);
+      setMessage(nextFoundWords.length === wordSearchWords.length ? 'Semua kata ditemukan! Laba-laba kecil ikut merayakan ✦' : `${match.word} ditemukan! ✦`);
+    } else if (cells.length > 1) {
+      setMessage(match ? 'Kata itu sudah ditemukan—cari yang lain.' : 'Belum ketemu, coba tarik garis lurus di huruf-hurufnya.');
+    }
+    dragStartRef.current = null;
+    paintSelection([]);
+  };
+
+  return <section className="scene center-scene game-scene word-search-scene">
+    <div className="word-search-layout">
+      <div className="word-search-note">
+        <span className="kicker">13 · tiga kata untukmu</span>
+        <h1>Tiga kata<br /><em>bersembunyi di sini.</em></h1>
+        <p>Tarik garis lurus di atas huruf untuk menemukan:</p>
+        <div className="word-search-targets">{wordSearchWords.map(({ word }) => <strong key={word}>{word}</strong>)}</div>
+        <div className="word-search-found" aria-live="polite">{foundWords.map((word) => <span className="found-word" key={word}>✦ {word}</span>)}</div>
+      </div>
+      <div className="word-search-board-wrap">
+        <div className="word-search-grid" ref={gridRef} role="grid" aria-label="Pencarian kata 10 kali 10" onPointerDown={(event) => {
+          const target = (event.target as HTMLElement).closest<HTMLElement>('.word-search-cell');
+          if (!target) return;
+          event.preventDefault();
+          event.currentTarget.setPointerCapture(event.pointerId);
+          const start = { row: Number(target.dataset.row), col: Number(target.dataset.col) };
+          dragStartRef.current = start;
+          paintSelection([start]);
+        }} onPointerMove={moveSelection} onPointerUp={finishSelection} onPointerCancel={finishSelection}>
+          {wordSearchGrid.flatMap((line, row) => line.map((letter, col) => {
+            const key = `${row}-${col}`;
+            const classes = ['word-search-cell', selectedCells.some((cell) => cell.row === row && cell.col === col) ? 'is-selecting' : '', foundCells.includes(key) ? 'is-found' : ''].filter(Boolean).join(' ');
+            return <span key={key} className={classes} data-row={row} data-col={col} role="gridcell" aria-label={`Baris ${row + 1}, kolom ${col + 1}, huruf ${letter}`}>{letter}</span>;
+          }))}
+          {hintLineStyle && <span className={`word-search-clue-line ${visibleHintWord ? 'is-visible' : ''}`} style={hintLineStyle} aria-hidden="true" />}
+        </div>
+        <div className="word-search-status"><strong className="word-search-count">{foundWords.length} dari {wordSearchWords.length} ditemukan</strong><p className="word-search-message" aria-live="polite">{message}</p></div>
+        {visibleHintWord && <p className="word-search-hint" role="status">Petunjuk kecil: ikuti garis biru yang berkedip ✦</p>}
+      </div>
+    </div>
   </section>;
 }
