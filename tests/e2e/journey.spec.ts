@@ -126,6 +126,8 @@ test('catching all six flowers reveals the envelope, then the four-chat video pa
     await expect(page.locator('.photo-card img').nth(index)).toHaveAttribute('src', `/img/${filename}`);
   }
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('.memories-scene .photo-hint')).toHaveText('Tekan foto untuk melihat lebih jelas');
+  await expect(page.locator('.photo-2 > p')).toHaveText('Pertemanan sejati = momen nopal bilang temen');
   await expect(page.locator('.photo-card > p').first()).toHaveCSS('font-size', '12px');
   await page.getByRole('button', { name: 'Perbesar foto: Pertama ketemu' }).click();
   await expect(page.getByRole('dialog', { name: 'Pertama ketemu' })).toBeVisible();
@@ -203,6 +205,7 @@ test('blowing out the candle shows a gentle confetti celebration', async ({ page
   await page.getByRole('button', { name: /masih ada kejutan kecil untukmu/i }).click();
   await expect(page.locator('.portrait-scene')).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('.portrait-photo-hint')).toHaveText('Tekan foto untuk melihat lebih jelas');
   await expect(page.locator('.portrait-frame')).toHaveCount(3);
   await expect(page.locator('.portrait-image')).toHaveCount(3);
   await expect(page.locator('.portrait-image').nth(0)).toHaveAttribute('src', /nopal-photo-left\.jpeg/);

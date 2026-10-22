@@ -324,7 +324,7 @@ export default function Home() {
 
       {scene === 'envelope' && <section className="scene center-scene envelope-scene"><span className="kicker">04 · ada surat untukmu</span><h1>Tekan amplopnya,<br /><em>pelan-pelan.</em></h1><button className={`envelope-button ${envelopeOpening ? 'opening' : ''}`} onClick={openEnvelope} disabled={envelopeOpening} aria-label="Buka amplop"><span className="envelope-back" /><span className="envelope-letter">♥</span><span className="envelope-flap" /><span className="envelope-front" /><Image className="spider envelope-spider" src={spider} alt="Laba-laba kecil menjaga amplop" width={80} height={80} /></button><p>Di dalamnya ada kenangan dan sebuah lagu.</p></section>}
 
-      {scene === 'memories' && <section className="scene memories-scene"><div className="section-heading"><span className="kicker">05–06 · beberapa chat manis</span><h1>Empat chat spesial<br /><em>seperti lagu untuk elu.</em></h1></div>
+      {scene === 'memories' && <section className="scene memories-scene"><div className="section-heading"><span className="kicker">05–06 · beberapa chat manis</span><h1>Empat chat spesial<br /><em>seperti lagu untuk elu.</em></h1><p className="photo-hint">↗ Tekan foto untuk melihat lebih jelas</p></div>
         <div className="memories-layout"><div className="photo-stack" aria-label="Empat slot chat kenangan">{gift.photos.map((photo, index) => <article className={`photo-card photo-${index + 1}`} key={photo.label}><button className="memory-photo memory-photo-trigger" type="button" aria-label={`Perbesar foto: ${photo.label}`} onClick={() => setActivePhoto({ src: photo.src, alt: `Chat kenangan: ${photo.label}`, label: photo.label })}><Image src={photo.src} alt={`Chat kenangan: ${photo.label}`} width={720} height={1233} unoptimized /></button><p>{photo.label}</p></article>)}</div>
           <div className="video-card"><div className="video-heading"><span>NOW PLAYING</span><strong>kenangan favorit</strong></div><div className="video-frame"><iframe id="nopalpante-youtube" title="Video kenangan untuk Nopal" src={`https://www.youtube.com/embed/${gift.videoId}?enablejsapi=1&playsinline=1&rel=0`} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /></div><div className="video-note"><span className="video-dot" />{videoPlaying ? 'Musik halaman berhenti selama video diputar' : 'Lagu halaman tersedia di pemutar bawah'}</div></div></div>
         <button className="primary-button" onClick={() => go('candle')}>Lanjutkan ceritanya <span>→</span></button>
@@ -351,11 +351,11 @@ export default function Home() {
 
       {scene === 'portrait' && <section className="scene center-scene portrait-scene">
         <div className="portrait-content">
-          <div className="portrait-gallery" aria-label="Tiga foto Nopal">{[
+          <div className="portrait-photos"><p className="photo-hint portrait-photo-hint">↗ Tekan foto untuk melihat lebih jelas</p><div className="portrait-gallery" aria-label="Tiga foto Nopal">{[
             { src: '/img/nopal-photo-left.jpeg', alt: 'Foto Nopal sebelah kiri' },
             { src: '/img/nopal-photo-center.jpeg', alt: 'Foto Nopal di tengah' },
             { src: '/img/nopal-photo-right.jpeg', alt: 'Foto Nopal sebelah kanan' },
-          ].map((photo) => <button className="portrait-frame portrait-image-trigger" type="button" key={photo.src} aria-label={`Perbesar foto ${photo.alt.replace('Foto Nopal ', '')}`} onClick={() => setActivePhoto({ src: photo.src, alt: photo.alt, label: photo.alt.replace('Foto Nopal ', 'Foto Nopal ') })}><Image className="portrait-image" src={photo.src} alt={photo.alt} width={900} height={1600} unoptimized /></button>)}</div>
+          ].map((photo) => <button className="portrait-frame portrait-image-trigger" type="button" key={photo.src} aria-label={`Perbesar foto Nopal ${photo.alt.replace('Foto Nopal ', '')}`} onClick={() => setActivePhoto({ src: photo.src, alt: photo.alt, label: photo.alt })}><Image className="portrait-image" src={photo.src} alt={photo.alt} width={900} height={1600} unoptimized /></button>)}</div></div>
           <article className="message-paper portrait-letter">
             <h2>Selamat ulang tahun, Nopal.</h2>
             <p>semoga sehat selalu panjang umur dimurahkan rezeki nya agar bisa teef gua terus  , intinya sehat terus aja dan jangan emosian jadi orang gabaik dan juga jaga kesehatan lu jangan sampe kambuh-kambuh , kalo ada apa-apa look at me gua selalu ada buat lu</p>

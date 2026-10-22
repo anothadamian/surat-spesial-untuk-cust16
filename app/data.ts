@@ -6,7 +6,7 @@ export const gift = {
   music: '/music/anugerah-terindah.mp3',
   photos: [
     { label: 'Pertama ketemu', src: '/img/nopal-chat-01.jpeg' },
-    { label: 'Pertemanan sejati', src: '/img/nopal-chat-02.jpeg' },
+    { label: 'Pertemanan sejati = momen nopal bilang temen', src: '/img/nopal-chat-02.jpeg' },
     { label: 'Menunggu princess', src: '/img/nopal-chat-03.jpeg' },
     { label: 'Momen babu nyariin princess', src: '/img/nopal-chat-04.jpeg' },
   ],
